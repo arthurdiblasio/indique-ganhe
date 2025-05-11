@@ -1,15 +1,55 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
+}
+
+model Partner {
+  id        String   @id @default(uuid())
+  name      String
+  cnpj      String   @unique
+  createdAt DateTime @default(now())
+
+  users  User[]
+  people Person[]
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  createdAt DateTime @default(now())
+
+  partnerId String
+  partner   Partner @relation(fields: [partnerId], references: [id])
+}
+
+model Person {
+  id        String   @id @default(uuid())
+  name      String
+  phone     String
+  createdAt DateTime @default(now())
+
+  partnerId String
+  partner   Partner @relation(fields: [partnerId], references: [id])
+
+  indicationsMade     Indication[] @relation("IndicationsMade")
+  indicationsReceived Indication[] @relation("IndicationsReceived")
+}
+
+model Indication {
+  id              String   @id @default(uuid())
+  procedure       String
+  planValue       Decimal  @db.Decimal(10, 2)
+  commissionValue Decimal  @db.Decimal(10, 2)
+  createdAt       DateTime @default(now())
+
+  indicatedId String
+  indicated   Person @relation("IndicationsReceived", fields: [indicatedId], references: [id])
+
+  indicatedById String
+  indicatedBy   Person @relation("IndicationsMade", fields: [indicatedById], references: [id])
 }
