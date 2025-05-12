@@ -15,7 +15,7 @@ export function ProtectedLayout({ children }: { children: React.ReactNode }) {
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const sidebarWidth = isExpanded ? "16rem" : "5rem";
+  const sidebarWidth = isExpanded ? "12rem" : "5rem";
 
   return (
     <div

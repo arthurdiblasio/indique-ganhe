@@ -180,7 +180,7 @@ export default function NewReferralPage() {
           <div className="flex justify-between">
             <button
               type="submit"
-              className="bg-cyan-800 text-white  hover:bg-cyan-900 py-2 px-4 rounded-md "
+              className="bg-cyan-800 text-white  hover:bg-cyan-900 py-2 px-4 rounded-md"
             >
               Registrar Indicação
             </button>
