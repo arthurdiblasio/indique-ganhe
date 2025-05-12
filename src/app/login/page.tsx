@@ -15,9 +15,13 @@ export default function LoginPage() {
 
     const res = await fetch('/api/auth/login', {
       method: 'POST',
+      credentials: 'include',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password, remember })
     })
+
+    console.log('res', res);
+    
 
     if (res.ok) {
       router.push('/dashboard')
@@ -71,7 +75,7 @@ export default function LoginPage() {
 
           <button
             type="submit"
-            className="w-full bg-primary text-white py-2 px-4 rounded-md hover:opacity-90 transition"
+            className="w-full bg-red text-white py-2 px-4 rounded-md hover:opacity-90 transition"
           >
             Entrar
           </button>
