@@ -30,7 +30,7 @@ model User {
 model Person {
   id        String   @id @default(uuid())
   name      String
-  phone     String
+  phone     String   @unique()
   createdAt DateTime @default(now())
 
   partnerId String
