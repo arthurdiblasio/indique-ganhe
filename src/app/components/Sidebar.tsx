@@ -18,7 +18,7 @@ export function Sidebar() {
       <nav className="space-y-4">
         <h2 className="text-xl font-bold text-primary mb-4">Menu</h2>
         <a href="/dashboard" className="block text-gray-700 hover:text-primary">Dashboard</a>
-        <a href="/indicar" className="block text-gray-700 hover:text-primary">Nova Indicação</a>
+        <a href="/referrals/new" className="block text-gray-700 hover:text-primary">Nova Indicação</a>
         <a href="/clientes" className="block text-gray-700 hover:text-primary">Nova Cliente</a>
       </nav>
 
