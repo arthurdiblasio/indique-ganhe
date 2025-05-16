@@ -1,5 +1,7 @@
 "use client";
 
+import { PhoneInput } from "@/app/components/PhoneInput";
+import { PrimaryButton } from "@/app/components/PrimaryButton";
 import { ProtectedLayout } from "@/app/components/ProtectedLayout";
 import { useState } from "react";
 // import { useRouter } from 'next/navigation'
@@ -10,21 +12,33 @@ export default function NewReferralPage() {
 
   const [referrerPhone, setReferrerPhone] = useState("");
   const [referrerName, setReferrerName] = useState("");
+  const [referredNotFound, setReferredNotFound] = useState(false);
   const [referredPhone, setReferredPhone] = useState("");
   const [referredName, setReferredName] = useState("");
+  const [referrerNotFound, setReferrerNotFound] = useState(false);
   const [procedure, setProcedure] = useState("");
   const [planValue, setPlanValue] = useState("");
   const [commissionValue, setCommissionValue] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const fetchPerson = async (phone: string, setName: (n: string) => void) => {
-    const res = await fetch(`/api/people?phone=${phone}`);
-    if (res.ok) {
-      const data = await res.json();
-      setName(data.name);
-    } else {
-      setName("");
+  const fetchPerson = async (
+    phone: string,
+    setName: (n: string) => void,
+    setNotFound: (b: boolean) => void
+  ) => {
+    console.log('phone', phone);
+    if (phone) {
+      const res = await fetch(`/api/people?phone=${phone}`);
+      if (res.ok) {
+        const data = await res.json();
+        setName(data.name);
+        setNotFound(false);
+      } else {
+        setName("");
+        setNotFound(true);
+      }
     }
   };
 
@@ -50,6 +64,8 @@ export default function NewReferralPage() {
       return;
     }
 
+    setLoading(true);
+
     const res = await fetch("/api/referrals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -63,6 +79,8 @@ export default function NewReferralPage() {
         planValue: Number(planValue),
       }),
     });
+
+    setLoading(false);
 
     if (res.ok) {
       setSuccess("Indicação registrada com sucesso!");
@@ -98,23 +116,39 @@ export default function NewReferralPage() {
           {/* Referrer */}
           <div>
             <label className="block text-sm">Telefone de quem indicou</label>
-            <input
+            {/* <input
               type="text"
               value={referrerPhone}
               onChange={(e) => setReferrerPhone(e.target.value)}
               onBlur={() => fetchPerson(referrerPhone, setReferrerName)}
-              className="w-full border p-2 rounded-md"
+              className="w-full border p-2 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
+              placeholder="John"
+              required
+            /> */}
+            <PhoneInput
+              value={referrerPhone}
+              onChange={(e) => setReferrerPhone(e.target.value)}
+              onBlur={() =>
+                fetchPerson(referrerPhone, setReferrerName, setReferrerNotFound)
+              }
+              placeholder="(99) 99999-9999"
+              className="focus:outline-none focus:ring-1 focus:ring-primary"
               required
             />
-            {referrerName ? (
-              <p className="text-sm text-gray-600">Nome: {referrerName}</p>
+            {!referrerName && referrerNotFound && (
+              <p className="text-sm text-yellow-600 mt-1">
+                Nome de quem indicou não está cadastrado. Preencha corretamente para realizar o cadastro.
+              </p>
+            )}
+            {!referrerNotFound ? (
+              <p className="text-sm pt-1 text-gray-600">Nome: {referrerName}</p>
             ) : (
               <input
                 type="text"
                 placeholder="Nome de quem indicou"
                 value={referrerName}
                 onChange={(e) => setReferrerName(e.target.value)}
-                className="w-full mt-2 border p-2 rounded-md"
+                className="w-full mt-2 pt-2 border p-2 rounded-md"
                 required
               />
             )}
@@ -123,16 +157,24 @@ export default function NewReferralPage() {
           {/* Referred */}
           <div>
             <label className="block text-sm">Telefone da pessoa indicada</label>
-            <input
-              type="text"
+            <PhoneInput
               value={referredPhone}
               onChange={(e) => setReferredPhone(e.target.value)}
-              onBlur={() => fetchPerson(referredPhone, setReferredName)}
-              className="w-full border p-2 rounded-md"
+              onBlur={() =>
+                fetchPerson(referredPhone, setReferredName, setReferredNotFound)
+              }
+              placeholder="(99) 99999-9999"
+              className="focus:outline-none focus:ring-1 focus:ring-primary"
               required
             />
-            {referredName ? (
-              <p className="text-sm text-gray-600">Nome: {referredName}</p>
+            {!referredName && referredNotFound && (
+              <p className="text-sm text-yellow-600 mt-1">
+                Nome do indicado não está cadastrado. Por favor, insira o nome
+                para realizar o cadastro.
+              </p>
+            )}
+            {!referredNotFound ? (
+              <p className="text-sm pt-1 text-gray-600">Nome: {referredName}</p>
             ) : (
               <input
                 type="text"
@@ -178,12 +220,13 @@ export default function NewReferralPage() {
           {error && <p className="text-sm text-red-600">{error}</p>}
           {success && <p className="text-sm text-green-600">{success}</p>}
           <div className="flex justify-between">
-            <button
+            <PrimaryButton
               type="submit"
-              className="bg-cyan-800 text-white  hover:bg-cyan-900 py-2 px-4 rounded-md"
+              className="font-semi-bold"
+              isLoading={loading}
             >
-              Registrar Indicação
-            </button>
+              Registrar
+            </PrimaryButton>
             <button className="bg-red-800 text-white  hover:bg-red-900 py-2 px-4 rounded-md ">
               Cancelar
             </button>

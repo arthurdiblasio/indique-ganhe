@@ -85,10 +85,7 @@ export async function GET(req: NextRequest) {
         take: 10,
       });
 
-      console.log('Indications GET:', indications);
-      
-
-    return NextResponse.json({ indications })
+    return NextResponse.json(indications)
   } catch (e) {
     console.error(e)
     return NextResponse.json({ error: 'Erro ao registrar indicação' }, { status: 500 })

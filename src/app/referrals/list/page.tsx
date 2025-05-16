@@ -1,6 +1,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { ProtectedLayout } from "@/app/components/ProtectedLayout";
+import Link from "next/link";
 
 interface Indication {
   id: string;
@@ -18,38 +19,24 @@ interface Indication {
 
 export default async function DashboardPage() {
   const token = (await cookies()).get("token")?.value;
-  if (!token) {
-    redirect("/login");
+  if (!token) redirect("/login");
 
-    return (
-      <p className="text-center mt-10 text-red-600">Token não encontrado</p>
-    );
-  }
-
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/referrals`,
-    {
-      headers: {
-        Cookie: cookies().toString(),
-      },
-      cache: "no-store",
-    }
-  );
-
-  if (!response.ok) throw new Error("Erro ao buscar as indicações");
-
-  const indications: Indication[] = await response.json();
-
-  console.log(indications);
+  const indications: Indication[] = await getIndications();
 
   return (
     <ProtectedLayout>
       <main className="max-w-4xl mx-auto p-6">
         <div className="flex justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-800 ">Indicações</h2>
-          <button className="bg-cyan-800 text-white  hover:bg-cyan-900 py-2 px-4 rounded-md">
+          {/* <button className="bg-cyan-800 text-white  hover:bg-cyan-900 py-2 px-4 rounded-md">
             Nova Indicação
-          </button>
+          </button> */}
+          <Link
+            href="/referrals/new"
+            className="block w-fit bg-cyan-800 text-white hover:bg-cyan-900 py-2 px-4 rounded-md text-center"
+          >
+            Nova Indicação
+          </Link>
         </div>
 
         {indications.length === 0 ? (
@@ -107,4 +94,20 @@ export default async function DashboardPage() {
       </main>
     </ProtectedLayout>
   );
+}
+async function getIndications() {
+  const response = await fetch(
+    `${process.env.NEXT_PUBLIC_BASE_URL}/api/referrals`,
+    {
+      headers: {
+        Cookie: cookies().toString(),
+      },
+      cache: "no-store",
+    }
+  );
+
+  if (!response.ok) throw new Error("Erro ao buscar as indicações");
+
+  const indications: Indication[] = await response.json();
+  return indications;
 }
