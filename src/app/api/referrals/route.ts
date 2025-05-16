@@ -1,6 +1,6 @@
-import { prisma } from '@/lib/prisma'
-import { NextRequest, NextResponse } from 'next/server'
-import jwt from 'jsonwebtoken'
+import { prisma } from "@/lib/prisma";
+import { NextRequest, NextResponse } from "next/server";
+import jwt from "jsonwebtoken";
 
 interface TokenPayload {
   sub: string;
@@ -10,11 +10,16 @@ interface TokenPayload {
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const token = req.cookies.get("token")?.value;
+    if (!token)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { partnerId: string }
-    const body = await req.json()
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+      partnerId: string;
+    };
+    const body = await req.json();
+
+    console.log("body", body);
 
     const {
       referrerPhone,
@@ -22,15 +27,25 @@ export async function POST(req: NextRequest) {
       referredPhone,
       referredName,
       procedure,
-      planValue
-    } = body
+      planValue,
+    } = body;
 
-    const partnerId = decoded.partnerId
+    const partnerId = decoded.partnerId;
 
-    const referrer = await getOrCreatePerson(referrerPhone, referrerName, partnerId)
-    const referred = await getOrCreatePerson(referredPhone, referredName, partnerId)
+    const referrer = await getOrCreatePerson(
+      setOnlyNumbers(referrerPhone.toString()),
+      referrerName,
+      partnerId
+    );
+    const referred = await getOrCreatePerson(
+      setOnlyNumbers(referredPhone.toString()),
+      referredName,
+      partnerId
+    );
 
-    const commission = Number((planValue * 0.05).toFixed(2))
+    const commission = Number(
+      (Number(setOnlyNumbers(planValue.toString())) * 0.05).toFixed(2)
+    );
 
     await prisma.indication.create({
       data: {
@@ -38,56 +53,71 @@ export async function POST(req: NextRequest) {
         planValue,
         commissionValue: commission,
         indicatedById: referrer.id,
-        indicatedId: referred.id
-      }
-    })
+        indicatedId: referred.id,
+      },
+    });
 
-    return NextResponse.json({ success: true })
+    return NextResponse.json({ success: true });
   } catch (e) {
-    console.error(e)
-    return NextResponse.json({ error: 'Erro ao registrar indicação' }, { status: 500 })
+    console.error(e);
+    return NextResponse.json(
+      { error: "Erro ao registrar indicação" },
+      { status: 500 }
+    );
   }
 
-  async function getOrCreatePerson(phone: string, name: string, partnerId: string) {
-		const existing = await prisma.person.findUnique({ where: { phone } })
-		if (existing) return existing
-		return await prisma.person.create({
-			data: { name, phone, partnerId }
-		})
+  function setOnlyNumbers(str: string) {
+    return str.replace(/\D/g, "");
+  }
+
+  async function getOrCreatePerson(
+    phone: string,
+    name: string,
+    partnerId: string
+  ) {
+    const existing = await prisma.person.findUnique({ where: { phone } });
+    if (existing) return existing;
+    return await prisma.person.create({
+      data: { name, phone, partnerId },
+    });
   }
 }
 
 export async function GET(req: NextRequest) {
   try {
-    const token = req.cookies.get('token')?.value
-    if (!token) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    const token = req.cookies.get("token")?.value;
+    if (!token)
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-      let decoded: TokenPayload;
-      try {
-        decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
-      } catch {
-        throw new Error('Invalid token');
-      }
+    let decoded: TokenPayload;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+    } catch {
+      throw new Error("Invalid token");
+    }
 
-      const indications = await prisma.indication.findMany({
-        where: {
-          indicatedBy: {
-            partnerId: decoded.partnerId,
-          },
+    const indications = await prisma.indication.findMany({
+      where: {
+        indicatedBy: {
+          partnerId: decoded.partnerId,
         },
-        include: {
-          indicated: true,
-          indicatedBy: true,
-        },
-        orderBy: {
-          createdAt: "desc",
-        },
-        take: 10,
-      });
+      },
+      include: {
+        indicated: true,
+        indicatedBy: true,
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+      take: 10,
+    });
 
-    return NextResponse.json(indications)
+    return NextResponse.json(indications);
   } catch (e) {
-    console.error(e)
-    return NextResponse.json({ error: 'Erro ao registrar indicação' }, { status: 500 })
+    console.error(e);
+    return NextResponse.json(
+      { error: "Erro ao registrar indicação" },
+      { status: 500 }
+    );
   }
 }

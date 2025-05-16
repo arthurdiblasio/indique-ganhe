@@ -4,12 +4,16 @@ import { MoneyInput } from "@/app/components/MoneyInput";
 import { PhoneInput } from "@/app/components/PhoneInput";
 import { PrimaryButton } from "@/app/components/PrimaryButton";
 import { ProtectedLayout } from "@/app/components/ProtectedLayout";
+import { useToast } from "@/app/hooks/useToast";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 // import { useRouter } from 'next/navigation'
 import { useEffect } from "react";
 
 export default function NewReferralPage() {
-  //   const router = useRouter()
+
+  const toast = useToast()
+  const router = useRouter()
 
   const [referrerPhone, setReferrerPhone] = useState("");
   const [referrerName, setReferrerName] = useState("");
@@ -72,30 +76,29 @@ export default function NewReferralPage() {
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
-        referrerPhone,
+        referrerPhone: Number(referrerPhone.replace(/\D/g, '')),
         referrerName,
-        referredPhone,
+        referredPhone: Number(referredPhone.replace(/\D/g, '')),
         referredName,
         procedure,
-        planValue: Number(planValue),
+        planValue: Number(planValue.replace(/\D/g, '')),
       }),
     });
 
     setLoading(false);
 
-    if (res.ok) {
-      setSuccess("Indicação registrada com sucesso!");
-      setReferrerPhone("");
-      setReferrerName("");
-      setReferredPhone("");
-      setReferredName("");
-      setProcedure("");
-      setPlanValue("");
-      setCommissionValue("");
-    } else {
-      const data = await res.json();
-      setError(data.error || "Erro ao registrar indicação");
-    }
+    if (!res.ok) return toast('Erro ao realizar indicação!', 'error')
+
+    setSuccess("Indicação registrada com sucesso!");
+    setReferrerPhone("");
+    setReferrerName("");
+    setReferredPhone("");
+    setReferredName("");
+    setProcedure("");
+    setPlanValue("");
+    setCommissionValue("");
+    toast('Indicação registrada com sucesso!', 'success')
+    router.push('/referrals/list')
   };
 
   return (
