@@ -1,5 +1,6 @@
 "use client";
 
+import { MoneyInput } from "@/app/components/MoneyInput";
 import { PhoneInput } from "@/app/components/PhoneInput";
 import { PrimaryButton } from "@/app/components/PrimaryButton";
 import { ProtectedLayout } from "@/app/components/ProtectedLayout";
@@ -97,17 +98,6 @@ export default function NewReferralPage() {
     }
   };
 
-  const updateCommission = (value: string) => {
-    setPlanValue(value);
-    const num = parseFloat(value);
-    if (!isNaN(num)) {
-      const commission = (num * 0.05).toFixed(2);
-      setCommissionValue(commission);
-    } else {
-      setCommissionValue("");
-    }
-  };
-
   return (
     <ProtectedLayout>
       <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg border border-gray-200 shadow">
@@ -116,15 +106,6 @@ export default function NewReferralPage() {
           {/* Referrer */}
           <div>
             <label className="block text-sm">Telefone de quem indicou</label>
-            {/* <input
-              type="text"
-              value={referrerPhone}
-              onChange={(e) => setReferrerPhone(e.target.value)}
-              onBlur={() => fetchPerson(referrerPhone, setReferrerName)}
-              className="w-full border p-2 rounded-md focus:outline-none focus:ring-1 focus:ring-primary"
-              placeholder="John"
-              required
-            /> */}
             <PhoneInput
               value={referrerPhone}
               onChange={(e) => setReferrerPhone(e.target.value)}
@@ -202,12 +183,14 @@ export default function NewReferralPage() {
           {/* Plan Value */}
           <div>
             <label className="block text-sm">Valor do Plano</label>
-            <input
-              type="number"
-              step="0.01"
+            <MoneyInput
+              label="Valor do Plano"
               value={planValue}
-              onChange={(e) => updateCommission(e.target.value)}
-              className="w-full border p-2 rounded-md"
+              onChange={(formatted, numeric) => {
+                setPlanValue(formatted)
+                const commission = (numeric * 0.05).toFixed(2)
+                setCommissionValue(commission)
+              }}
               required
             />
             {commissionValue && (
