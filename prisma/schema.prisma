@@ -32,12 +32,29 @@ model Person {
   name      String
   phone     String   @unique()
   createdAt DateTime @default(now())
+  balance   Float    @default(0)
 
   partnerId String
   partner   Partner @relation(fields: [partnerId], references: [id])
 
   indicationsMade     Indication[] @relation("IndicationsMade")
   indicationsReceived Indication[] @relation("IndicationsReceived")
+  statements          Statement[]
+}
+
+enum StatementType {
+  CREDIT
+  DEBIT
+}
+
+model Statement {
+  id        String        @id @default(uuid())
+  personId  String
+  person    Person        @relation(fields: [personId], references: [id])
+  amount    Float
+  type      StatementType
+  reason    String
+  createdAt DateTime      @default(now())
 }
 
 model Indication {

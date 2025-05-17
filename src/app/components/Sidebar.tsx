@@ -37,8 +37,8 @@ export function Sidebar({
         <a href="/referrals/list" className="hover:text-primary truncate">
           {isExpanded ? "Indicações" : "➕"}
         </a>
-        <a href="/clients/new" className="hover:text-primary truncate">
-          {isExpanded ? "Clientes" : "👤"}
+        <a href="/persons/new" className="hover:text-primary truncate">
+          {isExpanded ? "Pessoas" : "👤"}
         </a>
       </nav>
 

@@ -1,56 +1,60 @@
-import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcryptjs'
-import jwt from 'jsonwebtoken'
-import { NextResponse } from 'next/server'
+import { prisma } from "@/lib/prisma";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
-  const body = await req.json()
-  console.log('body', body);
-  
-  const { email, password, remember } = body
+  const body = await req.json();
+
+  const { email, password, remember } = body;
 
   if (!email || !password) {
-    return NextResponse.json({ error: 'Email e senha são obrigatórios' }, { status: 400 })
+    return NextResponse.json(
+      { error: "Email e senha são obrigatórios" },
+      { status: 400 }
+    );
   }
 
-  const user = await prisma.user.findUnique({ where: { email }, include: { partner: true } })
+  const user = await prisma.user.findUnique({
+    where: { email },
+    include: { partner: true },
+  });
 
   if (!user) {
-    return NextResponse.json({ error: 'Usuário não encontrado' }, { status: 401 })
+    return NextResponse.json(
+      { error: "Usuário não encontrado" },
+      { status: 401 }
+    );
   }
 
-  const valid = await bcrypt.compare(password, user.password)
+  const valid = await bcrypt.compare(password, user.password);
 
   if (!valid) {
-    return NextResponse.json({ error: 'Senha incorreta' }, { status: 401 })
+    return NextResponse.json({ error: "Senha incorreta" }, { status: 401 });
   }
-
-  console.log('Passou de tudo');
-  
 
   const token = jwt.sign(
     {
       sub: user.id,
       partnerId: user.partnerId,
-      email: user.email
+      email: user.email,
     },
     process.env.JWT_SECRET!,
     {
-      expiresIn: remember ? '30d' : '1d'
+      expiresIn: remember ? "30d" : "1d",
     }
-  )
+  );
 
-  const response = NextResponse.json({ message: 'Login efetuado' })
+  const response = NextResponse.json({ message: "Login efetuado" });
 
-  response.cookies.set('token', token, {
+  response.cookies.set("token", token, {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: process.env.NODE_ENV === "production",
     maxAge: remember ? 60 * 60 * 24 * 30 : 60 * 60 * 24, // 30 dias ou 1 dia
-    path: '/'
-  })
+    path: "/",
+  });
 
-  console.log('Usuário autenticado, redirecionando para dashboard')
+  console.log("Usuário autenticado, redirecionando para dashboard");
 
-
-  return response
+  return response;
 }

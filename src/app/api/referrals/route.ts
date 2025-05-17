@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
+import { StatementType } from "@prisma/client";
 
 interface TokenPayload {
   sub: string;
@@ -19,8 +20,6 @@ export async function POST(req: NextRequest) {
     };
     const body = await req.json();
 
-    console.log("body", body);
-
     const {
       referrerPhone,
       referrerName,
@@ -29,6 +28,8 @@ export async function POST(req: NextRequest) {
       procedure,
       planValue,
     } = body;
+
+    const planValueInCents = planValue / 100;
 
     const partnerId = decoded.partnerId;
 
@@ -44,18 +45,32 @@ export async function POST(req: NextRequest) {
     );
 
     const commission = Number(
-      (Number(setOnlyNumbers(planValue.toString())) * 0.05).toFixed(2)
+      (Number(setOnlyNumbers(planValueInCents.toString())) * 0.05).toFixed(2)
     );
 
-    await prisma.indication.create({
-      data: {
-        procedure,
-        planValue,
-        commissionValue: commission,
-        indicatedById: referrer.id,
-        indicatedId: referred.id,
-      },
-    });
+    await prisma.$transaction([
+      prisma.indication.create({
+        data: {
+          procedure,
+          planValue: planValueInCents,
+          commissionValue: commission,
+          indicatedById: referrer.id,
+          indicatedId: referred.id,
+        },
+      }),
+      prisma.statement.create({
+        data: {
+          personId: referrer.id,
+          amount: Number(commission),
+          type: StatementType.CREDIT,
+          reason: `Indicação de ${referredName} para o procedimento ${procedure}`,
+        },
+      }),
+      prisma.person.update({
+        where: { id: referrer.id },
+        data: { balance: { increment: Number(commission) } },
+      }),
+    ]);
 
     return NextResponse.json({ success: true });
   } catch (e) {

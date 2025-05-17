@@ -25,12 +25,9 @@ export default async function DashboardPage() {
 
   return (
     <ProtectedLayout>
-      <main className="max-w-4xl mx-auto p-6">
+      <main className="mx-1 pt-3 px-0">
         <div className="flex justify-between mb-4">
           <h2 className="text-lg font-bold text-gray-800 ">Indicações</h2>
-          {/* <button className="bg-cyan-800 text-white  hover:bg-cyan-900 py-2 px-4 rounded-md">
-            Nova Indicação
-          </button> */}
           <Link
             href="/referrals/new"
             className="block w-fit bg-cyan-800 text-white hover:bg-cyan-900 py-2 px-4 rounded-md text-center"
@@ -46,12 +43,12 @@ export default async function DashboardPage() {
             <table className="border-collapse border border-gray-400 w-full">
               <thead className="bg-gray-100">
                 <tr>
-                  <th className="px-4 py-2">Indicado</th>
-                  <th className="px-4 py-2">Indicado por</th>
-                  <th className="px-4 py-2">Procedimento</th>
-                  <th className="px-4 py-2">Valor</th>
-                  {/* <th className="px-4 py-2">Comissão</th> */}
-                  <th className="px-4 py-2">Data da Indicação</th>
+                  <th className="text-left px-4 py-2">Indicado</th>
+                  <th className="text-left px-4 py-2">Indicado por</th>
+                  <th className="text-left px-4 py-2">Procedimento</th>
+                  <th className="text-left px-4 py-2">Valor</th>
+                  <th className="text-left px-4 py-2">Comissão</th>
+                  <th className="text-left px-4 py-2">Data da Indicação</th>
                 </tr>
               </thead>
               <tbody>
@@ -64,13 +61,10 @@ export default async function DashboardPage() {
                       <div className="text-sm">
                         R$ {Number(ind.planValue).toFixed(2)}
                       </div>
-                      <div className="text-teal-800 text-xs">
-                        R$ {Number(ind.commissionValue).toFixed(2)}
-                      </div>
                     </td>
-                    {/* <td className="px-4 py-2">
+                    <td className="px-4 py-2 text-emerald-700">
                       R$ {Number(ind.commissionValue).toFixed(2)}
-                    </td> */}
+                    </td>
                     <td className="px-4 py-2">
                       {new Date(ind.indicated.createdAt).toLocaleString(
                         "pt-BR",
@@ -78,10 +72,6 @@ export default async function DashboardPage() {
                           day: "2-digit",
                           month: "2-digit",
                           year: "numeric",
-                          hour: "2-digit",
-                          minute: "2-digit",
-                          second: "2-digit",
-                          hour12: false,
                         }
                       )}
                     </td>
@@ -96,11 +86,13 @@ export default async function DashboardPage() {
   );
 }
 async function getIndications() {
+  const cookieStore = await cookies()
+  const cookieHeader = cookieStore.toString()
   const response = await fetch(
     `${process.env.NEXT_PUBLIC_BASE_URL}/api/referrals`,
     {
       headers: {
-        Cookie: cookies().toString(),
+        Cookie: cookieHeader,
       },
       cache: "no-store",
     }

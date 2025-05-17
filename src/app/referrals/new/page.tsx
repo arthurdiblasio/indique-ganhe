@@ -5,6 +5,7 @@ import { PhoneInput } from "@/app/components/PhoneInput";
 import { PrimaryButton } from "@/app/components/PrimaryButton";
 import { ProtectedLayout } from "@/app/components/ProtectedLayout";
 import { useToast } from "@/app/hooks/useToast";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 // import { useRouter } from 'next/navigation'
@@ -213,9 +214,12 @@ export default function NewReferralPage() {
             >
               Registrar
             </PrimaryButton>
-            <button className="bg-red-800 text-white  hover:bg-red-900 py-2 px-4 rounded-md ">
+            <Link
+              href="/referrals/list"
+              className="block w-fit bg-red-800 text-white  hover:bg-red-900 py-2 px-4 rounded-md items-center justify-center"
+            >
               Cancelar
-            </button>
+            </Link>
           </div>
         </form>
       </div>
