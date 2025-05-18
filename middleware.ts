@@ -4,10 +4,7 @@ export const runtime = "nodejs";
 
 export function middleware(req: NextRequest) {
   const token = req.cookies.get("token")?.value;
-  console.log("token", token);
-
   if (!token) {
-    console.log("Token não encontrado");
     return NextResponse.redirect(new URL("/login", req.url));
   }
 

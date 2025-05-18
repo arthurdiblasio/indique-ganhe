@@ -34,7 +34,6 @@ export default function NewReferralPage() {
     setName: (n: string) => void,
     setNotFound: (b: boolean) => void
   ) => {
-    console.log('phone', phone);
     if (phone) {
       const res = await fetch(`/api/people?phone=${phone}`);
       if (res.ok) {
@@ -104,7 +103,7 @@ export default function NewReferralPage() {
 
   return (
     <ProtectedLayout>
-      <div className="max-w-2xl mx-auto bg-white p-6 rounded-lg border border-gray-200 shadow">
+      <div className="mx-auto bg-white p-6 rounded-lg border border-gray-200 shadow">
         <h1 className="text-2xl font-bold mb-4">Nova Indicação</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Referrer */}
@@ -186,7 +185,6 @@ export default function NewReferralPage() {
 
           {/* Plan Value */}
           <div>
-            <label className="block text-sm">Valor do Plano</label>
             <MoneyInput
               label="Valor do Plano"
               value={planValue}
@@ -216,7 +214,7 @@ export default function NewReferralPage() {
             </PrimaryButton>
             <Link
               href="/referrals/list"
-              className="block w-fit bg-red-800 text-white  hover:bg-red-900 py-2 px-4 rounded-md items-center justify-center"
+              className="block w-fit bg-red-800 text-white  hover:bg-red-900 py-3 px-4 rounded-md items-center justify-center"
             >
               Cancelar
             </Link>

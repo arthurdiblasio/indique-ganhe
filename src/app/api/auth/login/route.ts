@@ -54,7 +54,5 @@ export async function POST(req: Request) {
     path: "/",
   });
 
-  console.log("Usuário autenticado, redirecionando para dashboard");
-
   return response;
 }
