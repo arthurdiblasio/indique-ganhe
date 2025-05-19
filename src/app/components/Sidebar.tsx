@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowRightLeft, House, MoveLeft, MoveRight, PlusCircle, UserPlus } from "lucide-react";
+import { Coins, House, MoveLeft, MoveRight, PlusCircle, UserPlus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function Sidebar({
@@ -20,14 +20,14 @@ export function Sidebar({
   return (
     <aside className="h-screen border-r border-gray-200 bg-gray-100 transition-all duration-300">
       <div className="h-16 flex items-center justify-between px-4 border-b">
-        <span className="font-bold text-primary text-sm pr-1 truncate">
-          {isExpanded ? "Indique e Ganhe" : <ArrowRightLeft size={30} />}
+        <span className="font-bold text-primary text-sm pr-2 truncate">
+          {isExpanded ? "Indique e Ganhe" : <Coins className="pr-2" size={30} />}
         </span>
         <button
           className="text-xs text-gray-600 hidden md:block"
           onClick={toggleSidebar}
         >
-          {isExpanded ? <MoveLeft className="cursor-pointer" size={20} /> : <MoveRight className="cursor-pointer" size={20} />}
+          {isExpanded ? <MoveLeft className="cursor-pointer" size={18} /> : <MoveRight className="cursor-pointer" size={18} />}
         </button>
       </div>
 

@@ -19,34 +19,11 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  return NextResponse.json({ id: person.id, name: person.name });
-}
-
-export async function GET_TOP_BALANCE(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const limit = Number(searchParams.get("limit")) || 10;
-
-  const people = await prisma.person.findMany({
-    orderBy: {
-      balance: "desc",
-    },
-    take: limit,
-    select: {
-      id: true,
-      name: true,
-      phone: true,
-      balance: true,
-    },
+  return NextResponse.json({
+    id: person.id,
+    name: person.name,
+    balance: person.balance,
   });
-
-  if (!people.length) {
-    return NextResponse.json(
-      { error: "Nenhuma pessoa encontrada" },
-      { status: 404 }
-    );
-  }
-
-  return NextResponse.json(people);
 }
 
 function removeAllThatNotNumbers(searchParams: URLSearchParams) {
