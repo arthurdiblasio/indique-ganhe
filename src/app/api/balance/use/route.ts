@@ -38,9 +38,9 @@ export async function POST(req: NextRequest) {
           personId: customer.id,
           amount: Number(value),
           type: StatementType.DEBIT,
-          reason: `Uso de saldo de ${formatMoney(value)} para uso em ${
-            partner.name
-          }`,
+          reason: `Uso de saldo de ${formatMoney(
+            value.toString()
+          )} para uso em ${partner.name}`,
         },
       }),
       prisma.person.update({

@@ -20,15 +20,12 @@ export default function NewReferralPage() {
   const [clientPhone, setClientPhone] = useState("");
   const [clientName, setClientName] = useState("");
   const [clientBalance, setClientBalance] = useState(0);
-  const [referredPhone, setReferredPhone] = useState("");
-  const [referredName, setReferredName] = useState("");
   const [clientNotFound, setClientNotFound] = useState(false);
-  const [procedure, setProcedure] = useState("");
-  const [planValue, setPlanValue] = useState("");
-  const [commissionValue, setCommissionValue] = useState("");
+  const [value, setValue] = useState('');
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingPerson, setLoadingPerson] = useState(false);
 
   const fetchPerson = async (
     phone: string,
@@ -37,7 +34,9 @@ export default function NewReferralPage() {
     setNotFound: (b: boolean) => void
   ) => {
     if (phone) {
+      setLoadingPerson(true);
       const res = await fetch(`/api/people?phone=${phone}`);
+      setLoadingPerson(false);
       if (res.ok) {
         const data = await res.json();
         setName(data.name);
@@ -52,57 +51,50 @@ export default function NewReferralPage() {
   };
 
   useEffect(() => {
-    if (clientPhone && referredPhone && clientPhone === referredPhone) {
+    if (Number(value.replace(/\D/g, '')) / 100 > clientBalance) {
       setError(
-        "O telefone de quem indicou não pode ser igual ao da pessoa indicada."
+        "O valor inserido é maior do que o saldo disponível."
       );
     } else {
       setError("");
     }
-  }, [clientPhone, referredPhone]);
+  }, [value, clientBalance]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setSuccess("");
+    setLoading(true);
 
-    if (clientPhone === referredPhone) {
-      setError(
-        "O telefone de quem indicou não pode ser igual ao da pessoa indicada."
-      );
-      return;
+    const valueNumber = Number(value.replace(/\D/g, '')) / 100
+
+    if (!valueNumber || valueNumber > clientBalance) {
+      setLoading(false);
+      setError('Valor de saldo inválido')
+      return
     }
 
-    setLoading(true);
 
     const res = await fetch("/api/balance/use", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
-        value: Number(clientPhone.replace(/\D/g, '')),
-        phone,
-        referredPhone: Number(referredPhone.replace(/\D/g, '')),
-        referredName,
-        procedure,
-        planValue: Number(planValue.replace(/\D/g, '')),
+        value: valueNumber,
+        phone: clientPhone,
       }),
     });
 
     setLoading(false);
 
-    if (!res.ok) return toast('Erro ao realizar indicação!', 'error')
+    if (!res.ok) return toast('Erro ao realizar uso de saldo!', 'error')
 
-    setSuccess("Indicação registrada com sucesso!");
     setClientPhone("");
     setClientName("");
-    setReferredPhone("");
-    setReferredName("");
-    setProcedure("");
-    setPlanValue("");
-    setCommissionValue("");
-    toast('Indicação registrada com sucesso!', 'success')
-    router.push('/referrals/list')
+    setValue("");
+    setSuccess("Uso de saldo realizado com sucesso!");
+    toast('Uso de saldo realizado com sucesso!', 'success')
+    router.push('/dashboard')
   };
 
   return (
@@ -128,10 +120,13 @@ export default function NewReferralPage() {
                 Não foi encontrado ninguém com esse telefone.
               </p>
             )}
-            <div>
+            {loadingPerson && (
+              <p className="text-sm text-gray-500 mt-1">Carregando cliente...</p>
+            )}
+            {!clientNotFound && <div>
               <p className="text-base pt-1 text-gray-600">Nome: {clientName}</p>
               <p className="text-sm pt-1 text-green-600">Saldo: {formatMoney(clientBalance.toString())}</p>
-            </div>
+            </div>}
           </div>
 
           {/* Value */}
@@ -139,28 +134,20 @@ export default function NewReferralPage() {
             {clientName && (
               <MoneyInput
                 label="Valor à usar"
-                value={planValue}
+                value={value}
+                max={clientBalance}
                 onChange={(formatted, numeric) => {
                   const result = clientBalance - numeric;
-                  console.log(result);
-
-                  if (result < 0) {
+                  if (result <= 0) {
                     setError("Saldo insuficiente");
                   } else {
                     setError("");
                   }
 
-                  setPlanValue(formatted)
-                  const commission = (numeric * 0.05).toFixed(2)
-                  setCommissionValue(commission)
+                  setValue(formatted)
                 }}
                 required
               />)}
-            {commissionValue && (
-              <p className="text-sm text-green-600 mt-1">
-                Comissão (5%): R$ {commissionValue}
-              </p>
-            )}
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
@@ -170,11 +157,12 @@ export default function NewReferralPage() {
               type="submit"
               className="font-semi-bold"
               isLoading={loading}
+              disabled={!clientName || !value || !!error || loading}
             >
               Registrar
             </PrimaryButton>
             <Link
-              href="/referrals/list"
+              href="/dashboard"
               className="block w-fit bg-red-800 text-white  hover:bg-red-900 py-3 px-4 rounded-md items-center justify-center"
             >
               Cancelar

@@ -6,6 +6,7 @@ interface MoneyInputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 'o
   value: string
   onChange: (value: string, numeric: number) => void
   label?: string
+  max?: number // valor numérico máximo permitido
 }
 
 export function MoneyInput({
@@ -13,6 +14,7 @@ export function MoneyInput({
   onChange,
   onBlur,
   label,
+  max,
   className,
   ...props
 }: MoneyInputProps) {
@@ -26,9 +28,14 @@ export function MoneyInput({
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const valueOnlyNumbers = e.target.value.replace(/\D/g, '')
-    const valurCurrency = formatCurrency(valueOnlyNumbers)
-    const valueInCents = Number(valueOnlyNumbers) / 100
-    onChange(valurCurrency, valueInCents)
+    let valueInCents = Number(valueOnlyNumbers) / 100
+
+    if (max && valueInCents > max) {
+      valueInCents = max
+    }
+
+    const formatted = formatCurrency((valueInCents * 100).toString())
+    onChange(formatted, valueInCents)
   }
 
   return (

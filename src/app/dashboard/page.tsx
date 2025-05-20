@@ -244,7 +244,6 @@ export default function DashboardPage() {
     async function fetchData() {
       const topRes = await fetch('/api/people/top-balance')
       const topData = await topRes.json()
-      console.log(topData);
 
       setTopPeople(topData)
 
