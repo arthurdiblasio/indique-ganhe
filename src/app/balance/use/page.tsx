@@ -99,7 +99,7 @@ export default function NewReferralPage() {
 
   return (
     <ProtectedLayout>
-      <div className="mx-auto bg-white p-6 rounded-lg border border-gray-200 shadow">
+      <div className="mx-auto bg-white p-6 rounded-lg border border-gray-200 shadow-xl">
         <h1 className="text-2xl font-bold mb-4">Registro de uso de saldo</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* client */}
@@ -123,7 +123,7 @@ export default function NewReferralPage() {
             {loadingPerson && (
               <p className="text-sm text-gray-500 mt-1">Carregando cliente...</p>
             )}
-            {!clientNotFound && <div>
+            {clientName && <div>
               <p className="text-base pt-1 text-gray-600">Nome: {clientName}</p>
               <p className="text-sm pt-1 text-green-600">Saldo: {formatMoney(clientBalance.toString())}</p>
             </div>}
