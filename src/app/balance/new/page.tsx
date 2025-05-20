@@ -5,7 +5,6 @@ import { PhoneInput } from "@/app/components/PhoneInput";
 import { PrimaryButton } from "@/app/components/PrimaryButton";
 import { ProtectedLayout } from "@/app/components/ProtectedLayout";
 import { useToast } from "@/app/hooks/useToast";
-import { formatMoney } from "@/utils/formatters";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -19,7 +18,7 @@ export default function NewReferralPage() {
 
   const [clientPhone, setClientPhone] = useState("");
   const [clientName, setClientName] = useState("");
-  const [clientBalance, setClientBalance] = useState(0);
+  const [clientBalance, setClientBalance] = useState("");
   const [referredPhone, setReferredPhone] = useState("");
   const [referredName, setReferredName] = useState("");
   const [clientNotFound, setClientNotFound] = useState(false);
@@ -33,7 +32,7 @@ export default function NewReferralPage() {
   const fetchPerson = async (
     phone: string,
     setName: (n: string) => void,
-    setBalance: (b: number) => void,
+    setBalance: (b: string) => void,
     setNotFound: (b: boolean) => void
   ) => {
     if (phone) {
@@ -45,7 +44,7 @@ export default function NewReferralPage() {
         setNotFound(false);
       } else {
         setName("");
-        setBalance(0);
+        setBalance("");
         setNotFound(true);
       }
     }
@@ -75,13 +74,13 @@ export default function NewReferralPage() {
 
     setLoading(true);
 
-    const res = await fetch("/api/balance/use", {
+    const res = await fetch("/api/referrals", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       credentials: "include",
       body: JSON.stringify({
-        value: Number(clientPhone.replace(/\D/g, '')),
-        phone,
+        clientPhone: Number(clientPhone.replace(/\D/g, '')),
+        clientName,
         referredPhone: Number(referredPhone.replace(/\D/g, '')),
         referredName,
         procedure,
@@ -130,32 +129,34 @@ export default function NewReferralPage() {
             )}
             <div>
               <p className="text-base pt-1 text-gray-600">Nome: {clientName}</p>
-              <p className="text-sm pt-1 text-green-600">Saldo: {formatMoney(clientBalance.toString())}</p>
+              <p className="text-sm pt-1 text-green-600">Saldo: {clientBalance}</p>
             </div>
           </div>
 
-          {/* Value */}
+          {/* Procedure */}
           <div>
-            {clientName && (
-              <MoneyInput
-                label="Valor à usar"
-                value={planValue}
-                onChange={(formatted, numeric) => {
-                  const result = clientBalance - numeric;
-                  console.log(result);
+            <label className="block text-sm">Procedimento</label>
+            <input
+              type="text"
+              value={procedure}
+              onChange={(e) => setProcedure(e.target.value)}
+              className="w-full border p-2 rounded-md"
+              required
+            />
+          </div>
 
-                  if (result < 0) {
-                    setError("Saldo insuficiente");
-                  } else {
-                    setError("");
-                  }
-
-                  setPlanValue(formatted)
-                  const commission = (numeric * 0.05).toFixed(2)
-                  setCommissionValue(commission)
-                }}
-                required
-              />)}
+          {/* Plan Value */}
+          <div>
+            <MoneyInput
+              label="Valor do Plano"
+              value={planValue}
+              onChange={(formatted, numeric) => {
+                setPlanValue(formatted)
+                const commission = (numeric * 0.05).toFixed(2)
+                setCommissionValue(commission)
+              }}
+              required
+            />
             {commissionValue && (
               <p className="text-sm text-green-600 mt-1">
                 Comissão (5%): R$ {commissionValue}

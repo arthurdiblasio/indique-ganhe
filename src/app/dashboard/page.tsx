@@ -216,6 +216,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { PlusCircle, UserPlus, Wallet } from 'lucide-react'
 import { ProtectedLayout } from '../components/ProtectedLayout'
+import { formatPhone } from '@/utils/formatters'
 
 interface TopPerson {
   id: string
@@ -290,7 +291,7 @@ export default function DashboardPage() {
             <ul className="divide-y">
               {topPeople.map((p) => (
                 <li key={p.id} className="flex justify-between items-center py-2">
-                  <span className="text-gray-700">{p.name} ({p.phone})</span>
+                  <span className="text-gray-700">{p.name} - {formatPhone(p.phone)}</span>
                   <span className="font-semibold text-green-700">R$ {p.balance.toFixed(2)}</span>
                 </li>
               ))}
