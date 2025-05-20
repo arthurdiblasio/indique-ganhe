@@ -27,19 +27,19 @@ export function Sidebar({
           className="text-xs text-gray-600 hidden md:block"
           onClick={toggleSidebar}
         >
-          {isExpanded ? <MoveLeft className="cursor-pointer" size={18} /> : <MoveRight className="cursor-pointer" size={18} />}
+          {isExpanded ? <MoveLeft className="cursor-pointer hover:text-cyan-900" size={18} /> : <MoveRight className="cursor-pointer hover:text-cyan-900" size={18} />}
         </button>
       </div>
 
       <nav className="flex flex-col mt-4 gap-3 px-4 text-base text-gray-800">
         <a href="/dashboard" className="hover:text-gray-950 truncate hover:font-bold font-semi-bold">
-          {isExpanded ? "Dashboard" : <House size={30} />}
+          {isExpanded ? "Dashboard" : <House className="hover:text-cyan-900" size={30} />}
         </a>
         <a href="/referrals/list" className="hover:text-gray-950 truncate hover:font-bold font-semi-bold">
-          {isExpanded ? "Indicações" : <PlusCircle size={30} />}
+          {isExpanded ? "Indicações" : <PlusCircle className="hover:text-cyan-900" size={30} />}
         </a>
         <a href="/persons/new" className="hover:text-gray-950 truncate hover:font-bold font-semi-bold">
-          {isExpanded ? "Pessoas" : <UserPlus size={30} />}
+          {isExpanded ? "Pessoas" : <UserPlus className="hover:text-cyan-900" size={30} />}
         </a>
       </nav>
 

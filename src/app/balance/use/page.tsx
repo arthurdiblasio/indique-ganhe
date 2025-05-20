@@ -99,7 +99,7 @@ export default function NewReferralPage() {
 
   return (
     <ProtectedLayout>
-      <div className="mx-auto bg-white p-6 rounded-lg border border-gray-200 shadow-xl">
+      <div className="mx-auto bg-white p-6 rounded-lg border border-gray-200 shadow">
         <h1 className="text-2xl font-bold mb-4">Registro de uso de saldo</h1>
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* client */}
