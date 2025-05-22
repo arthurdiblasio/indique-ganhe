@@ -98,7 +98,7 @@ async function getIndications() {
     }
   );
 
-  if (!response.ok) throw new Error("Erro ao buscar as indicações");
+  if (!response.ok) return [];
 
   const indications: Indication[] = await response.json();
   return indications;
