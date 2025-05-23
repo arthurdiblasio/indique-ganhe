@@ -10,6 +10,8 @@
 !.yarn/releases
 !.yarn/versions
 
+/prisma/node_modules
+
 # testing
 /coverage
 

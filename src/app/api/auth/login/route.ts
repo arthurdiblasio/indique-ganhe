@@ -20,6 +20,8 @@ export async function POST(req: Request) {
     include: { partner: true },
   });
 
+  console.log("user", user);
+
   if (!user) {
     return NextResponse.json(
       { error: "Usuário não encontrado" },

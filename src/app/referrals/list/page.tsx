@@ -1,7 +1,11 @@
-import { cookies } from "next/headers";
-import { redirect } from "next/navigation";
+'use client';
+
+import Cookies from 'js-cookie';
+import { useRouter } from "next/navigation";
+
 import { ProtectedLayout } from "@/app/components/ProtectedLayout";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 interface Indication {
   id: string;
@@ -17,12 +21,23 @@ interface Indication {
   };
 }
 
-export default async function DashboardPage() {
-  const token = (await cookies()).get("token")?.value;
-  if (!token) redirect("/login");
+export default function DashboardPage() {
 
-  const indications: Indication[] = await getIndications();
 
+  const [indications, setIndications] = useState<Indication[]>([])
+
+  const router = useRouter();
+
+  useEffect(() => {
+    async function fetchData() {
+      await getIndications(setIndications).catch(console.error)
+    }
+
+    const token = Cookies.get('token');
+    if (!token) router.push("/login");
+
+    fetchData()
+  }, [router])
   return (
     <ProtectedLayout>
       <main className="mx-1 pt-3 px-0">
@@ -85,21 +100,20 @@ export default async function DashboardPage() {
     </ProtectedLayout>
   );
 }
-async function getIndications() {
-  const cookieStore = await cookies()
-  const cookieHeader = cookieStore.toString()
-  const response = await fetch(
-    `${process.env.NEXT_PUBLIC_BASE_URL}/api/referrals`,
-    {
-      headers: {
-        Cookie: cookieHeader,
-      },
-      cache: "no-store",
-    }
-  );
 
-  if (!response.ok) return [];
+async function getIndications(setIndications: (indication: Indication[]) => void) {
+  const response = await fetch("/api/referrals", {
+    cache: "no-store",
+  });
 
-  const indications: Indication[] = await response.json();
-  return indications;
+  if (!response.ok) {
+    throw new Error("Failed to fetch indications");
+  }
+
+  const indications = await response.json()
+
+  console.log('indications', indications);
+
+  setIndications(indications);
 }
+

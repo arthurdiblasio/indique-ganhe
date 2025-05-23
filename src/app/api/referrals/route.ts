@@ -1,23 +1,23 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import { StatementType } from "@prisma/client";
 
-interface TokenPayload {
-  sub: string;
-  partnerId: string;
-  email: string;
-}
+// interface TokenPayload {
+//   sub: string;
+//   partnerId: string;
+//   email: string;
+// }
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get("token")?.value;
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // const token = req.cookies.get("token")?.value;
+    // if (!token)
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      partnerId: string;
-    };
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+    //   partnerId: string;
+    // };
     const body = await req.json();
 
     const {
@@ -31,17 +31,17 @@ export async function POST(req: NextRequest) {
 
     const planValueInCents = planValue / 100;
 
-    const partnerId = decoded.partnerId;
+    const [partner] = await prisma.partner.findMany();
 
     const referrer = await getOrCreatePerson(
       setOnlyNumbers(referrerPhone.toString()),
       referrerName,
-      partnerId
+      partner.id
     );
     const referred = await getOrCreatePerson(
       setOnlyNumbers(referredPhone.toString()),
       referredName,
-      partnerId
+      partner.id
     );
 
     const commission = Number(
@@ -98,23 +98,25 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const token = req.cookies.get("token")?.value;
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // const token = req.cookies.get("token")?.value;
+    // if (!token)
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let decoded: TokenPayload;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
-    } catch {
-      throw new Error("Invalid token");
-    }
+    // let decoded: TokenPayload;
+    // try {
+    //   decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+    // } catch {
+    //   throw new Error("Invalid token");
+    // }
+
+    const [partner] = await prisma.partner.findMany();
 
     const indications = await prisma.indication.findMany({
       where: {
         indicatedBy: {
-          partnerId: decoded.partnerId,
+          partnerId: partner.id,
         },
       },
       include: {

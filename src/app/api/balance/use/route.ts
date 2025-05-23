@@ -1,35 +1,35 @@
 import { prisma } from "@/lib/prisma";
 import { NextRequest, NextResponse } from "next/server";
-import jwt from "jsonwebtoken";
+// import jwt from "jsonwebtoken";
 import { StatementType } from "@prisma/client";
 import { formatMoney } from "@/utils/formatters";
 
-interface TokenPayload {
-  sub: string;
-  partnerId: string;
-  email: string;
-}
+// interface TokenPayload {
+//   sub: string;
+//   partnerId: string;
+//   email: string;
+// }
 
 export async function POST(req: NextRequest) {
   try {
-    const token = req.cookies.get("token")?.value;
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // const token = req.cookies.get("token")?.value;
+    // if (!token)
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-      partnerId: string;
-    };
+    // const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
+    //   partnerId: string;
+    // };
     const body = await req.json();
 
     const { phone, value } = body;
 
-    const partnerId = decoded.partnerId;
+    // const partnerId = decoded.partnerId;
 
-    const partner = await getPartner(partnerId);
+    const partner = await getPartner();
 
     const customer = await getCustomer(
       setOnlyNumbers(phone.toString()),
-      partnerId
+      partner.id
     );
 
     await prisma.$transaction([
@@ -74,35 +74,31 @@ export async function POST(req: NextRequest) {
   }
 }
 
-async function getPartner(partnerId: string) {
-  const partner = await prisma.partner.findUnique({
-    where: { id: partnerId },
-  });
+async function getPartner() {
+  const partner = await prisma.partner.findMany();
 
-  if (!partner) {
-    throw new Error("Partner not found");
-  }
-
-  return partner;
+  return partner[0];
 }
 
-export async function GET(req: NextRequest) {
+export async function GET() {
   try {
-    const token = req.cookies.get("token")?.value;
-    if (!token)
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    // const token = req.cookies.get("token")?.value;
+    // if (!token)
+    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
-    let decoded: TokenPayload;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
-    } catch {
-      throw new Error("Invalid token");
-    }
+    // let decoded: TokenPayload;
+    // try {
+    //   decoded = jwt.verify(token, process.env.JWT_SECRET!) as TokenPayload;
+    // } catch {
+    //   throw new Error("Invalid token");
+    // }
+
+    const partner = await getPartner();
 
     const indications = await prisma.indication.findMany({
       where: {
         indicatedBy: {
-          partnerId: decoded.partnerId,
+          partnerId: partner.id,
         },
       },
       include: {
