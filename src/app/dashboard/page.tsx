@@ -108,6 +108,8 @@ export default function DashboardPage() {
 async function getPartner(setPartner: (partner: Partner) => void) {
   const response = await fetch('/api/partner')
   const partner = await response.json()
+  console.log('partner', partner);
+
   setPartner(partner)
 }
 

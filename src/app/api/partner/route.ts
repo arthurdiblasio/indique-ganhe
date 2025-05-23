@@ -24,5 +24,5 @@ export async function GET() {
 
   const partner = await prisma.partner.findMany();
 
-  return NextResponse.json({ partner: partner[0] });
+  return NextResponse.json(partner[0]);
 }
