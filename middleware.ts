@@ -1,8 +1,7 @@
-import { NextResponse, type NextRequest } from "next/server";
-import jwt from "jsonwebtoken";
+import { NextResponse } from "next/server";
 export const runtime = "nodejs";
 
-export function middleware(req: NextRequest) {
+export function middleware() {
   // const token = req.cookies.get("token")?.value;
   // if (!token) {
   //   return NextResponse.redirect(new URL("/login", req.url));
