@@ -1,20 +1,21 @@
-import { cookies } from 'next/headers'
+// import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
-import jwt from 'jsonwebtoken'
+// import jwt from 'jsonwebtoken'
 
 export default async function Home() {
-  const cookieStore = await cookies()
-  const token = cookieStore.get('token')?.value
+  // const cookieStore = await cookies()
+  // const token = cookieStore.get('token')?.value
 
-  if (!token) {
-    redirect('/login')
-  }
+  // if (!token) {
+  //   redirect('/login')
+  // }
+  redirect('/dashboard')
 
-  try {
+  // try {
 
-    jwt.verify(token, process.env.JWT_SECRET!)
-    redirect('/dashboard')
-  } catch {
-    redirect('/login')
-  }
+  //   // jwt.verify(token, process.env.JWT_SECRET!)
+  //   redirect('/dashboard')
+  // } catch {
+  // redirect('/login')
+  // }
 }
