@@ -112,8 +112,6 @@ async function getIndications(setIndications: (indication: Indication[]) => void
 
   const indications = await response.json()
 
-  console.log('indications', indications);
-
   setIndications(indications);
 }
 
