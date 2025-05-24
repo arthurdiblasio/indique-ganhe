@@ -16,7 +16,11 @@ interface TopPerson {
 interface UpcomingExpiration {
   id: string
   procedure: string
-  expiresIn: string
+  expiresAt: string
+  indicatedBy: {
+    name: string,
+    phone: string
+  }
   person: {
     name: string
     phone: string
@@ -128,8 +132,8 @@ export default function DashboardPage() {
                 {expiringIndications.map((i) => (
                   <li key={i.id} className="py-2">
                     <div className="flex justify-between mb-1">
-                      <span className="text-gray-700">{i.person.name} ({i.person.phone})</span>
-                      <span className="text-sm text-red-600">Expira: {new Date(i.expiresIn).toLocaleDateString('pt-BR')}</span>
+                      <span className="text-gray-700">{i.indicatedBy.name} ({formatPhone(i.indicatedBy.phone)})</span>
+                      <span className="text-sm text-red-600">Expira: {new Date(i.expiresAt).toLocaleDateString('pt-BR')}</span>
                     </div>
                     <div className="text-sm text-gray-500">Procedimento: {i.procedure}</div>
                   </li>
@@ -150,8 +154,14 @@ async function getPartner(setPartner: (partner: Partner) => void) {
 }
 
 async function getExpiringIndications(setExpiringIndications: (expiringIndications: UpcomingExpiration[]) => void) {
-  const expiringRes = await fetch('/api/indication/expiring')
+  const params = new URLSearchParams({
+    orderBy: 'expiresAt'
+  })
+
+  const expiringRes = await fetch(`/api/referrals?${params.toString()}`)
   const expiringData = await expiringRes.json()
+  console.log('expiringData', expiringData);
+
   setExpiringIndications(expiringData)
 }
 

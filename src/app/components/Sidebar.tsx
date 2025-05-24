@@ -1,7 +1,7 @@
 "use client";
 
 import { Coins, House, MoveLeft, MoveRight, PlusCircle, UserPlus } from "lucide-react";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 
 export function Sidebar({
   isExpanded,
@@ -10,12 +10,12 @@ export function Sidebar({
   isExpanded: boolean;
   toggleSidebar: () => void;
 }) {
-  const router = useRouter();
+  // const router = useRouter();
 
-  const handleLogout = () => {
-    document.cookie = "token=; Max-Age=0; path=/";
-    router.push("/login");
-  };
+  // const handleLogout = () => {
+  //   document.cookie = "token=; Max-Age=0; path=/";
+  //   router.push("/login");
+  // };
 
   return (
     <aside className="h-screen border-r border-gray-200 bg-gray-100 transition-all duration-300">
@@ -43,14 +43,14 @@ export function Sidebar({
         </a>
       </nav>
 
-      <div className="absolute bottom-4 left-4">
+      {/* <div className="absolute bottom-14 left-4">
         <button
           onClick={handleLogout}
           className="text-red-600 text-sm hover:underline truncate"
         >
-          {isExpanded ? "Sair" : "🚪"}
+          {isExpanded ? "Sair" : <DoorClosedIcon className="hover:text-cyan-900" size={30} />}
         </button>
-      </div>
+      </div> */}
     </aside>
   );
 }

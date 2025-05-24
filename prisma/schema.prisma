@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "./node_modules/@prisma/client"
 }
 
 datasource db {
@@ -64,6 +63,8 @@ model Indication {
   planValue       Decimal  @db.Decimal(10, 2)
   commissionValue Decimal  @db.Decimal(10, 2)
   createdAt       DateTime @default(now())
+  expiresAt       DateTime @default(now())
+  isExpired       Boolean  @default(false)
 
   indicatedId String
   indicated   Person @relation("IndicationsReceived", fields: [indicatedId], references: [id])

@@ -11,13 +11,6 @@ import { StatementType } from "@prisma/client";
 
 export async function POST(req: NextRequest) {
   try {
-    // const token = req.cookies.get("token")?.value;
-    // if (!token)
-    //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-
-    // const decoded = jwt.verify(token, process.env.JWT_SECRET!) as {
-    //   partnerId: string;
-    // };
     const body = await req.json();
 
     const {
@@ -56,6 +49,11 @@ export async function POST(req: NextRequest) {
           commissionValue: commission,
           indicatedById: referrer.id,
           indicatedId: referred.id,
+          expiresAt: (() => {
+            const date = new Date();
+            date.setMonth(date.getMonth() + 6);
+            return date;
+          })(),
         },
       }),
       prisma.statement.create({
@@ -98,8 +96,15 @@ export async function POST(req: NextRequest) {
   }
 }
 
-export async function GET() {
+export async function GET(req: NextRequest) {
   try {
+    const { searchParams } = new URL(req.url);
+    let orderBy: {} = searchParams.get("orderBy") || {
+      createdAt: "desc",
+    };
+
+    if (orderBy === "expiresAt") orderBy = { expiresAt: "asc" };
+
     // const token = req.cookies.get("token")?.value;
     // if (!token)
     //   return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -123,9 +128,7 @@ export async function GET() {
         indicated: true,
         indicatedBy: true,
       },
-      orderBy: {
-        createdAt: "desc",
-      },
+      orderBy,
       take: 10,
     });
 
